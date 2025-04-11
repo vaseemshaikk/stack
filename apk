@@ -1,3 +1,828 @@
-hello world
-devops
+   
+  -- DQL ASSIGNMENT2 - Food Delivery System
 
+/* 1.SELECT COMMAND
+A. Select all columns from the CUSTOMER table.
+*/
+ select *from customer;
+ /*
+Select the first_name, last_name, and email from the CUSTOMER table.
+*/
+select first_name,last_name,email
+from customer;
+/*
+Select the restaurant_name and location from the RESTAURANT table.
+*/
+select restaurant_name,location
+from restaurant;
+/*
+Select the item_name, price, and restaurant_id from the MENU_ITEM table.
+*/
+ select item_name,price,restaurant_id
+ from Menu_item;
+/* 
+2. WHERE Command
+Select all customers where loyalty_points are greater than 100.
+*/
+SELECT * 
+FROM customer 
+WHERE loyalty_points > 100;
+/*
+Select all menu items where price is less than 20.
+*/
+select * from menu_item
+where price<20;
+/*
+Select all orders where the status is 'Delivered'.
+*/
+select *from "ORDER"
+where status = 'delivered';
+/*
+Select all reviews where rating is equal to 5.
+*/
+select *from review
+where rating = 5;
+/*
+3. ORDER BY Command
+Select all restaurants and order them by restaurant_name in ascending order.
+*/
+SELECT * 
+FROM restaurant
+ORDER BY restaurant_name ASC;
+/*
+Select all customers and order them by last_name in descending order.
+*/
+select *from customer
+order by last_name DESC;
+/*
+Select all orders and order them by order_date in ascending order.
+*/
+select *from "ORDER"
+order by order_date ASC;
+/*
+Select all menu items and order them by price in descending order.
+*/
+select *from menu_item
+order by price DESC;
+/*
+4. TOP Command
+Select the top 5 customers from the CUSTOMER table based on loyalty_points.
+*/
+select *from customer
+order by loyalty_points DESC
+LIMIT 5;
+/*
+Select the top 10 most expensive items from the MENU_ITEM table.
+*/
+select *from Menu_item
+order by price DESC
+LIMIT 10;
+/*
+Select the top 3 latest orders from the ORDER table.
+*/
+select *from "ORDER"
+order by order_date DESC
+LIMIT 3;
+/*
+Select the top 5 restaurants from the RESTAURANT table based on location.
+*/
+select *from restaurant
+order by location 
+LIMIT 5;
+/*
+5. DISTINCT Command
+Select distinct status from the ORDER table.
+*/
+SELECT DISTINCT status 
+FROM "ORDER";
+/*
+Select distinct rating from the REVIEW table.
+*/
+SELECT DISTINCT rating
+from review;
+/*
+Select distinct restaurant_name from the RESTAURANT table.
+*/
+SELECT DISTINCT restaurant_name
+FROM RESTAURANT;
+/*
+Select distinct payment_method from the PAYMENT table.
+*/
+SELECT DISTINCT payment_method
+FROM PAYMENT;
+/*
+6. GROUP BY Command
+Group by restaurant_name from the RESTAURANT table and count the number of menu items per restaurant.
+*/
+SELECT a.restaurant_name, COUNT(b.menu_item_id) AS menu_item_count
+FROM RESTAURANT a
+INNER JOIN MENU_ITEM b ON a.restaurant_id = b.restaurant_id
+GROUP BY a.restaurant_name
+ORDER BY menu_item_count DESC;
+/*
+Group by customer_id from the ORDER table and calculate the total orders per customer.
+*/
+SELECT customer_id, COUNT(*) AS total_orders
+FROM "ORDER"
+GROUP BY customer_id
+ORDER BY total_orders DESC;
+/*
+Group by status from the DELIVERY table and count the number of deliveries per status.
+*/
+SELECT status, COUNT(*) AS delivery_count
+FROM DELIVERY
+GROUP BY status
+ORDER BY delivery_count DESC; 
+/*
+Group by rating from the REVIEW table and calculate the average rating per restaurant.
+*/
+SELECT restaurant_id, AVG(rating) AS average_rating
+FROM REVIEW
+GROUP BY restaurant_id
+ORDER BY average_rating DESC; 
+/*
+7. HAVING Command
+Group by restaurant_name from the MENU_ITEM table and filter the results where the average price is greater than 15.
+*/
+SELECT a.restaurant_name, AVG(b.price) AS average_price
+FROM MENU_ITEM b
+JOIN RESTAURANT a ON b.restaurant_id = a.restaurant_id
+GROUP BY a.restaurant_name
+HAVING AVG(b.price) > 15
+ORDER BY average_price DESC;
+/*
+Group by customer_id from the ORDER table and having total orders greater than 5.
+*/
+SELECT customer_id, COUNT(*) AS total_orders
+FROM "ORDER"
+GROUP BY customer_id
+HAVING COUNT(order_id) > 5
+ORDER BY total_orders DESC;
+/*
+Group by status from the DELIVERY table, having more than 10 deliveries in transit.
+*/
+SELECT status, COUNT(*) AS delivery_count
+FROM DELIVERY
+GROUP BY status
+HAVING status = 'In Transit' AND COUNT(*) > 10
+ORDER BY delivery_count DESC;
+/*
+Group by rating from the REVIEW table, having an average rating greater than 4 for restaurants.
+*/
+SELECT restaurant_id, AVG(rating) AS average_rating
+FROM REVIEW
+GROUP BY restaurant_id
+HAVING AVG(rating) > 4
+ORDER BY average_rating DESC;
+/*
+8. INNER JOIN Command
+Select all orders along with customer details using INNER JOIN between the ORDER and CUSTOMER tables.
+*/
+SELECT a.order_id, a.order_date, a.total_price, b.first_name, b.last_name, b.email, b.phone_number, b.address
+FROM "ORDER" a
+INNER JOIN CUSTOMER b ON a.customer_id = b.customer_id;
+/*
+Select all menu items and their corresponding restaurants using INNER JOIN between MENU_ITEM and RESTAURANT.
+*/
+SELECT a.menu_item_id, a.item_name, a.price, b.restaurant_name
+FROM MENU_ITEM a
+INNER JOIN RESTAURANT b ON a.restaurant_id = b.restaurant_id;
+/*
+Select all deliveries and the corresponding agent details using INNER JOIN between DELIVERY and DELIVERY_AGENT.
+*/
+
+SELECT a.delivery_id, a.delivery_date, a.status, 
+       b.agent_id, (b.first_name || ' ' || b.last_name) AS full_name, b.phone_number
+FROM DELIVERY a
+INNER JOIN DELIVERY_AGENT b ON a.agent_id = b.agent_id;
+/*
+Select all reviews and their corresponding restaurant details using INNER JOIN between REVIEW and RESTAURANT.
+*/
+SELECT a.review_id, a.rating, a.review_text, a.customer_id, 
+       a.restaurant_id, b.restaurant_name, b.location, b.contact_number
+FROM REVIEW a
+INNER JOIN RESTAURANT b ON a.restaurant_id = b.restaurant_id;
+
+/*
+9. LEFT JOIN Command
+Select all customers and their orders using LEFT JOIN, including customers without orders.
+*/
+SELECT a.customer_id, a.first_name, a.last_name, a.email, b.order_id, b.order_date, b.total_price
+FROM CUSTOMER a
+LEFT JOIN "ORDER" b ON a.customer_id = b.customer_id;
+/*
+Select all restaurants and their menu items using LEFT JOIN, including restaurants without any menu items.
+*/
+SELECT b.restaurant_id, b.restaurant_name, b.location, a.menu_item_id, a.item_name, a.price
+FROM RESTAURANT b
+LEFT JOIN MENU_ITEM a ON b.restaurant_id = a.restaurant_id;
+/*
+Select all orders and their corresponding deliveries using LEFT JOIN, including orders without deliveries.
+*/
+SELECT a.order_id, a.order_date, a.total_price, a.customer_id, 
+       b.delivery_id, b.delivery_date, b.status
+FROM "ORDER" a
+LEFT JOIN DELIVERY b ON a.order_id = b.order_id;
+/*
+Select all customers and their reviews using LEFT JOIN, including customers without reviews.
+*/
+SELECT a.customer_id, (a.first_name || ' ' || a.last_name) AS full_name, a.email, 
+       b.review_id, b.rating, b.review_text, b.restaurant_id
+FROM CUSTOMER a
+LEFT JOIN REVIEW b ON a.customer_id = b.customer_id;
+
+/*
+10. COUNT, SUM, AVG Command
+Count the total number of customers in the CUSTOMER table.
+*/
+SELECT COUNT(*) AS total_customers
+FROM CUSTOMER;
+/*
+Count the number of distinct restaurant_name in the RESTAURANT table.
+*/
+select COUNT(DISTINCT RESTAURANT_NAME)  AS distnic_restaurants
+from RESTAURANT;
+/*
+Calculate the sum of total_price from the ORDER table.
+*/
+SELECT SUM(total_price) AS total_sales
+FROM "ORDER";
+/*
+Calculate the average rating from the REVIEW table.
+*/
+SELECT AVG(rating) AS average_rating
+FROM REVIEW;
+/*
+11. CASE Command
+Select all menu items and use a CASE statement to categorize them as 'Expensive' if price is greater than 50, otherwise 'Affordable'.
+*/
+SELECT menu_item_id, item_name, price,
+       CASE
+         WHEN price > 50 THEN 'Expensive'
+        ELSE 'Affordable'
+       END AS price_category
+FROM MENU_ITEM;
+/*
+Select all orders and use a CASE statement to show 'High Value' if total_price is greater than 100, otherwise 'Standard'.
+*/
+SELECT order_id, order_date, total_price,
+       CASE
+          WHEN total_price > 100 THEN 'High Value'
+         ELSE 'Standard'
+   END AS order_value_category
+FROM "ORDER";
+/*
+Use a CASE statement in the REVIEW table to label ratings as 'Excellent' if rating is 5, otherwise 'Average'.
+*/
+SELECT review_id, rating, review_text,
+       CASE
+        WHEN rating = 5 THEN 'Excellent'
+        ELSE 'Average'
+     END AS rating_label
+FROM REVIEW;
+/*
+Use a CASE statement in the DELIVERY table to show 'On Time' if status is 'Delivered' and delivery_date is less than 1 hour from the order_date.
+*/SELECT a.delivery_id, a.delivery_date, b.order_date, b.status,
+CASE
+     WHEN b.status = 'Delivered' AND (a.delivery_date - b.order_date) < INTERVAL '1 hour' THEN 'On Time'
+          ELSE 'Not On Time'
+       END AS delivery_status
+FROM DELIVERY a
+INNER JOIN "ORDER" b ON a.order_id = a.order_id;
+/*
+12. EXISTS and NOT EXISTS Command
+Select all customers where an order exists in the ORDER table using EXISTS.
+*/
+SELECT c.customer_id, (c.first_name || ' ' || c.last_name) AS full_name, c.email
+FROM CUSTOMER c
+WHERE EXISTS (
+    SELECT 1
+    FROM "ORDER" o
+    WHERE o.customer_id = c.customer_id
+);
+/*
+Select all customers where no order exists in the ORDER table using NOT EXISTS.
+*/
+SELECT c.customer_id, (c.first_name || ' ' || c.last_name) AS full_name, c.email
+FROM CUSTOMER c
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM "ORDER" o
+    WHERE o.customer_id = c.customer_id
+);
+/*
+Select all restaurants where a menu item exists in the MENU_ITEM table using EXISTS.
+*/
+SELECT r.restaurant_id, r.restaurant_name, r.location
+FROM RESTAURANT r
+WHERE EXISTS (
+    SELECT 1
+    FROM MENU_ITEM m
+    WHERE m.restaurant_id = r.restaurant_id
+);
+/*
+Select all deliveries where no agents exist in the DELIVERY_AGENT table using NOT EXISTS.
+*/
+SELECT d.delivery_id, d.delivery_date, d.status
+FROM DELIVERY d
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM DELIVERY_AGENT da
+    WHERE da.agent_id = d.agent_id
+);
+
+/*
+13. SUBQUERY Command
+Select all customers whose customer_id is in the result of a subquery selecting customer_id from the ORDER table where total_price is greater than 50.
+*/
+SELECT c.customer_id, c.first_name, c.last_name, c.email
+FROM CUSTOMER c
+WHERE c.customer_id IN (
+    SELECT o.customer_id
+  FROM "ORDER" o
+    WHERE o.total_price > 50
+);
+/*
+Select all menu items where the menu_item_id is in the result of a subquery selecting menu_item_id from the ORDER_ITEM table.
+*/
+SELECT a.menu_item_id, a.item_name, a.price
+FROM MENU_ITEM a
+WHERE a.menu_item_id IN (
+    SELECT b.menu_item_id
+    FROM ORDER_ITEM b
+);
+/*
+Select all orders where the order_id is in the result of a subquery selecting order_id from the PAYMENT table where amount is greater than 100.
+*/
+SELECT a.order_id, a.order_date, a.total_price, a.customer_id
+FROM "ORDER" a
+WHERE a.order_id IN (
+    SELECT b.order_id
+    FROM PAYMENT b
+    WHERE b.amount > 100
+);
+/*
+Select all restaurants where the restaurant_id is in the result of a subquery selecting restaurant_id from the REVIEW table where rating is 5.
+*/
+SELECT r.restaurant_id, r.restaurant_name, r.location
+FROM RESTAURANT r
+WHERE r.restaurant_id IN (
+    SELECT review.restaurant_id
+    FROM REVIEW review
+    WHERE review.rating = 5
+);
+/*
+14. RANK and DENSE_RANK Command
+Rank customers based on the number of orders they have placed using RANK().
+*/
+SELECT a.customer_id, a.first_name || ' ' || a.last_name AS full_name, COUNT(b.order_id) AS total_orders,
+       RANK() OVER (ORDER BY COUNT(b.order_id) DESC) AS order_rank
+FROM CUSTOMER a
+LEFT JOIN "ORDER" b ON a.customer_id = a.customer_id
+GROUP BY a.customer_id
+ORDER BY order_rank;
+/*
+Use DENSE_RANK() to rank menu items based on their price.
+*/
+SELECT m.menu_item_id, m.item_name, m.price,
+       DENSE_RANK() OVER (ORDER BY m.price DESC) AS price_rank
+FROM MENU_ITEM m
+ORDER BY price_rank;
+/*
+Rank restaurants based on their average rating using RANK().
+*/
+SELECT a.restaurant_id, a.restaurant_name, AVG(b.rating) AS average_rating,
+       RANK() OVER (ORDER BY AVG(b.rating) DESC) AS rating_rank
+FROM RESTAURANT a
+JOIN REVIEW b ON a.restaurant_id = a.restaurant_id
+GROUP BY a.restaurant_id, a.restaurant_name
+ORDER BY rating_rank;
+
+/*
+Use DENSE_RANK() to rank customers based on the total amount of their orders.
+*/
+SELECT a.customer_id, a.first_name || ' ' || a.last_name AS full_name, SUM(b.total_price) AS total_spend,
+ DENSE_RANK() OVER (ORDER BY SUM(b.total_price) DESC) AS spending_rank
+FROM CUSTOMER a
+JOIN "ORDER" b ON a.customer_id = a.customer_id
+GROUP BY a.customer_id, a.first_name, a.last_name
+ORDER BY spending_rank;
+/*
+15. PIVOT and UNPIVOT
+Pivot the REVIEW data by restaurant_id and rating.
+Unpivot the restaurant details to show the restaurant_name, location, and contact_number for each restaurant.
+Pivot the menu item data by restaurant_id and item_name.
+Unpivot order details by order_id, total_price, and status.
+*/
+/*
+16. UNION and UNION ALL Command
+Select all customers from the CUSTOMER and DELIVERY tables using UNION.
+*/
+SELECT c.customer_id, c.first_name, c.last_name
+FROM CUSTOMER c
+UNION 
+SELECT c.customer_id, 'Unknown' AS first_name, 'Unknown' AS last_name
+FROM DELIVERY d
+inner join "ORDER" o ON d.order_id = o.order_id
+inner join CUSTOMER c ON o.customer_id = c.customer_id;
+/*
+Select all menu items from different categories using UNION ALL.
+*/
+SELECT menu_item_id, item_name, price, item_category
+FROM MENU_ITEM
+WHERE item_category = 'Desserts'
+
+UNION ALL
+
+SELECT menu_item_id, item_name, price, item_category
+FROM MENU_ITEM
+WHERE item_category = 'Soup'
+
+UNION ALL
+
+SELECT menu_item_id, item_name, price, item_category
+FROM MENU_ITEM
+WHERE item_category = 'Drinks'
+
+UNION ALL
+
+SELECT menu_item_id, item_name, price, item_category
+FROM MENU_ITEM
+WHERE item_category = 'Main Course'
+
+UNION ALL
+
+SELECT menu_item_id, item_name, price, item_category
+FROM MENU_ITEM
+WHERE item_category = 'Starter';
+/*
+Use UNION to combine pending and delivered orders.
+*/
+SELECT order_id, order_date, total_price, status
+FROM "ORDER"
+WHERE status = 'Pending'
+UNION
+SELECT order_id, order_date, total_price, status
+FROM "ORDER"
+WHERE status = 'Delivered';
+/*
+Use UNION ALL to select all deliveries from two different time periods.
+*/
+SELECT delivery_id, delivery_date, status
+FROM DELIVERY
+WHERE delivery_date BETWEEN '2025-01-01' AND '2025-02-07'  
+UNION ALL
+SELECT delivery_id, delivery_date, status
+FROM DELIVERY
+WHERE delivery_date BETWEEN '2025-01-10' AND '2025-02-03';  
+/*
+17. COALESCE, ISNULL, NULLIF Command
+Select all customers and use COALESCE to replace null loyalty_points with 0.
+*/
+SELECT customer_id, first_name, last_name, email, phone_number, gender,address,
+       COALESCE(loyalty_points, 0) AS loyalty_points
+FROM CUSTOMER;
+/*
+Use ISNULL to replace null phone_number in the DELIVERY_AGENT table with 'No Phone'.
+*/
+SELECT agent_id, first_name || ' ' || last_name AS full_name, COALESCE(phone_number, 'No Phone') AS phone_number
+FROM DELIVERY_AGENT;
+/*
+Use NULLIF to compare total_price and discount in the ORDER table and return NULL if they are the same.
+*/
+
+
+SELECT order_id, total_price, discount, 
+       NULLIF(total_price, discount) AS price_after_nullif
+FROM "ORDER";
+/*
+Select all menu items and use COALESCE to replace null price with 0.
+*/
+
+SELECT menu_item_id, item_name, restaurant_id,
+       COALESCE(price, 0) AS price
+FROM MENU_ITEM;
+/*
+18. STRING Functions
+Select all customers' first_name in uppercase using the UPPER() function.
+*/
+SELECT customer_id, UPPER(first_name) AS first_name_upper
+FROM CUSTOMER;
+/*
+Select all menu items' item_name in lowercase using the LOWER() function.
+*/
+SELECT menu_item_id, LOWER(item_name) AS item_name_lower
+FROM MENU_ITEM;
+/*
+Use CONCAT() to combine the first_name and last_name of customers.
+*/
+SELECT customer_id, CONCAT(first_name, ' ', last_name) AS full_name
+FROM CUSTOMER;
+/*
+Select all restaurants' restaurant_name and find the length of the string using LEN().
+*/
+SELECT restaurant_id, restaurant_name, LENGTH(restaurant_name) AS name_length
+FROM RESTAURANT;
+/*
+19. DATE Functions
+Select all orders and show their order_date formatted as 'YYYY-MM-DD' using FORMAT().
+*/
+SELECT order_id, 
+       TO_CHAR(order_date, 'YYYY-MM-DD') AS formated_order_date
+FROM "ORDER";
+/*
+Add 1 year to all delivery_date values in the DELIVERY table using DATEADD().
+*/
+UPDATE DELIVERY
+SET delivery_date = delivery_date + INTERVAL '1 year';
+/*
+Subtract 1 month from all order_date values using DATEADD().
+*/
+UPDATE "ORDER"
+SET order_date = order_date - INTERVAL '1 month';
+/*
+Select all customers and extract the year from their registration_date using YEAR().
+*/
+SELECT customer_id, first_name, last_name,gender,
+       EXTRACT(YEAR FROM created_at) AS registration_year
+FROM CUSTOMER;
+/*
+20. NUMERIC Functions
+Select the total_price from the ORDER table and round it to the nearest integer using ROUND().
+*/
+SELECT order_id, ROUND(total_price) AS rounded_price
+FROM "ORDER";
+/*
+Select all menu items' price and use CEILING() to round up their values.
+*/
+SELECT menu_item_id, item_name, CEILING(price) AS rounded_up_price
+FROM MENU_ITEM;
+/*
+Use FLOOR() to round down the prices in the MENU_ITEM table.
+*/
+SELECT menu_item_id, item_name, FLOOR(price) AS rounded_down_price
+FROM MENU_ITEM;
+/*
+Select the maximum total_price from the ORDER table using MAX().
+*/
+SELECT total_price
+FROM "ORDER"
+ORDER BY total_price DESC
+LIMIT 1;
+/*
+21. CAST and CONVERT Command
+Select all customers and cast the customer_id as a string using CAST().
+*/
+SELECT customer_id::VARCHAR AS customer_id_string, first_name, last_name, email, address
+FROM CUSTOMER;
+/*
+Convert the order_date in the ORDER table to VARCHAR using CONVERT().
+*/
+SELECT TO_CHAR(order_date, 'YYYY-MM-DD ') AS order_date_string
+FROM "ORDER";
+/*
+Cast the price in the MENU_ITEM table to INT.
+*/
+SELECT menu_item_id, item_name, price::INT AS price_int
+FROM MENU_ITEM;
+/*
+Convert the payment_date from the PAYMENT table to DATETIME.
+*/
+SELECT payment_id, payment_date::timestamp AS payment_date_datetime
+FROM PAYMENT;
+/*
+22. CONCAT and CONCAT_WS Functions
+Use CONCAT() to join first_name and last_name with a space in between in the CUSTOMER table.
+*/
+SELECT customer_id, CONCAT(first_name, ' ', last_name) AS full_name
+FROM CUSTOMER;
+/*
+Use CONCAT_WS() to combine the restaurant_name and location with a comma in the RESTAURANT table.
+*/
+SELECT restaurant_id, CONCAT_WS(', ', restaurant_name, location) AS restaurant_info
+FROM RESTAURANT;
+/*
+Use CONCAT() to combine the item_name and price from the MENU_ITEM table.
+*/
+SELECT menu_item_id, CONCAT(item_name, ' # ', price) AS item_info
+FROM MENU_ITEM;
+/*
+Use CONCAT_WS() to combine first_name, last_name, and phone_number from the DELIVERY_AGENT table.
+*/
+SELECT agent_id, CONCAT_WS(' ', first_name, last_name, phone_number) AS agent_details
+FROM DELIVERY_AGENT;
+/*
+23. LIKE and NOT LIKE
+Select customers where the email contains 'gmail.com' using LIKE.
+*/
+SELECT customer_id, CONCAT(first_name, ' ', last_name) AS full_name, email
+FROM CUSTOMER
+WHERE email ~ 'example.com';
+/*
+Select restaurants where restaurant_name starts with 'S' using LIKE.
+*/
+SELECT restaurant_id, restaurant_name, location
+FROM RESTAURANT
+WHERE restaurant_name LIKE 'S%';
+/*
+Select menu items where item_name contains 'Pizza' using LIKE.
+*/
+SELECT menu_item_id, item_name, price
+FROM MENU_ITEM
+WHERE item_name LIKE '%Pizza%';
+/*
+Select customers where phone_number does not contain '123' using NOT LIKE.
+*/
+SELECT customer_id, first_name, last_name, phone_number
+FROM CUSTOMER
+WHERE phone_number NOT LIKE '%123%';
+/*
+24. EXISTS and NOT EXISTS
+Select all customers where orders exist in the ORDER table using EXISTS.
+*/
+SELECT customer_id, CONCAT(first_name, ' ', last_name) AS full_name, email,address 
+FROM CUSTOMER a
+WHERE EXISTS (
+    SELECT 1
+    FROM "ORDER" b
+    WHERE b.customer_id = a.customer_id
+);
+/*
+Select all menu items where reviews exist using EXISTS.
+*/
+SELECT menu_item_id, item_name, price
+FROM MENU_ITEM a
+WHERE EXISTS (
+    SELECT 1
+    FROM REVIEW b
+    WHERE b.review_id = a.menu_item_id
+);
+/*
+Select all deliveries where agents exist using EXISTS.
+*/
+SELECT delivery_id, delivery_date, status
+FROM DELIVERY a
+WHERE EXISTS (
+    SELECT 1
+    FROM DELIVERY_AGENT b
+    WHERE b.agent_id = a.agent_id
+);
+/*
+Select all reviews where no customers exist using NOT EXISTS.
+*/
+SELECT review_id, rating, review_text, customer_id, restaurant_id
+FROM REVIEW r
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM CUSTOMER c
+    WHERE c.customer_id = r.customer_id
+);
+/*
+25. JOIN Commands
+Select all customers and their corresponding orders using INNER JOIN between CUSTOMER and ORDER.
+*/
+SELECT a.customer_id, a.first_name, a.last_name, b.order_id, b.order_date, b.total_price
+FROM CUSTOMER a
+INNER JOIN "ORDER" b ON a.customer_id = b.customer_id;
+/*
+Select all menu items and their corresponding orders using INNER JOIN between MENU_ITEM and ORDER_ITEM.
+*/
+SELECT a.menu_item_id, a.item_name, b.order_id, b.quantity
+FROM MENU_ITEM a
+INNER JOIN ORDER_ITEM b ON a.menu_item_id = b.menu_item_id;
+/*
+Select all deliveries and their corresponding agents using INNER JOIN between DELIVERY and DELIVERY_AGENT.
+*/
+SELECT a.delivery_id, a.delivery_date, a.status, b.agent_id, b.first_name, b.last_name, b.phone_number
+FROM DELIVERY a
+INNER JOIN DELIVERY_AGENT b ON a.agent_id = b.agent_id;
+/*
+Select all restaurants and their reviews using INNER JOIN between RESTAURANT and REVIEW.
+*/
+SELECT a.restaurant_id, a.restaurant_name, a.location, b.review_id, b.rating, b.review_text, b.customer_id
+FROM RESTAURANT a
+INNER JOIN REVIEW b ON a.restaurant_id =b.restaurant_id;
+/*
+26. BETWEEN Command
+Select all orders where the total_price is between 50 and 100.
+*/
+select * from "ORDER"
+	where total_price between  50 and 100;
+/*		
+Select all reviews where the rating is between 4 and 5.
+*/
+select *from review
+where rating between 4 and 5;
+/*
+Select all customers where the registration_date is between '2020-01-01' and '2022-01-01'.
+*/
+
+SELECT customer_id, first_name, last_name, email
+FROM CUSTOMER
+WHERE created_at BETWEEN '2020-01-01' AND '2022-01-01';
+ 
+/*
+Select all payments where the amount is between 20 and 500.
+*/
+select *from payment
+where amount between 20 and 500;
+/*
+27. IN and NOT IN Command
+Select all customers where the customer_id is in (101, 202, 303).
+*/
+select *from customer
+where customer_id in (101, 202, 303);
+/*
+Select all restaurants where the restaurant_name is in ('Pizza Palace', 'Burger Barn', 'Sushi Spot').
+*/
+select *from restaurant
+where restaurant_name in  ('Pizza Palace', 'Burger Barn', 'Sushi Spot');
+/*
+Select all orders where the status is not in ('Cancelled', 'Pending').
+*/
+select *from "ORDER"
+where status in ('Cancelled', 'Pending');
+/*
+Select all deliveries where the status is in ('In Transit', 'Delivered').
+*/
+select *from delivery
+where status in ('In Transit', 'Delivered');
+/*
+28. UNION Command
+Select all customers from the CUSTOMER and REVIEW tables using UNION.
+*/
+select customer_id from customer
+union all
+select customer_id from review
+order by customer_id;
+/*
+Select all menu items from different categories using UNION ALL.
+*/
+SELECT menu_item_id, item_name, price, item_category
+FROM MENU_ITEM
+WHERE item_category = 'Desserts'
+UNION ALL
+SELECT menu_item_id, item_name, price, item_category
+FROM MENU_ITEM
+WHERE item_category = 'Drinks'
+UNION ALL
+SELECT menu_item_id, item_name, price, item_category
+FROM MENU_ITEM
+WHERE item_category = 'Main Course'
+UNION ALL
+SELECT menu_item_id, item_name, price, item_category
+FROM MENU_ITEM
+WHERE item_category = 'Starters';
+ /*
+Use UNION to combine orders from two different time periods.
+*/
+SELECT '2024' AS order_year
+FROM "ORDER"
+WHERE 
+    EXTRACT(YEAR FROM order_date) = 2024
+UNION 
+SELECT '2025' AS order_year
+FROM "ORDER"
+WHERE 
+    EXTRACT(YEAR FROM order_date) = 2025;
+/*	
+Use UNION ALL to select all reviews from two different rating ranges.
+*/
+SELECT *
+FROM REVIEW
+WHERE rating BETWEEN 1 AND 3  
+UNION ALL
+SELECT *
+FROM REVIEW
+WHERE rating BETWEEN 4 AND 5; 
+/*
+29. ARRAY Command
+Select all item_name and convert it into an array using STRING_AGG().
+*/
+SELECT STRING_AGG(item_name, ', ') AS item_names
+FROM MENU_ITEM;
+/*
+Use UNSTRING() to expand arrays from the ORDER_ITEM table.
+*/
+
+
+/*
+Convert restaurant names into an array using STRING_AGG() in the RESTAURANT table.
+*/
+SELECT STRING_AGG(restaurant_name, ', ') AS restaurant_names
+FROM RESTAURANT;
+/*
+Use ARRAY functions to select and manipulate data from the REVIEW table.
+*/
+SELECT ARRAY(
+    SELECT review_text
+    FROM REVIEW
+    WHERE rating > 4
+) 
+AS top_reviews;
+
+SELECT review_id, unnest(ARRAY[5, 4, 3, 5]) AS rating
+FROM REVIEW;
+
+
+	
